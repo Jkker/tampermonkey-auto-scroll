@@ -11,5 +11,6 @@ export default defineConfig({
       name: 'auto-scroll',
       fileName: 'auto-scroll',
     },
+    minify: false,
   },
 });

@@ -2,11 +2,727 @@
 // @name         Auto Scroll Button
 // @namespace    https://github.com/Jkker/tampermonkey-auto-scroll
 // @version      1.0
-// @description  Auto scroll down the page
+// @description  Adds a button to auto scroll down the page when new content is loaded or by a interval
 // @author       Jkker
+// @license MIT
 // @match        *://*/*
 // @icon         https://raw.githubusercontent.com/Jkker/tampermonkey-auto-scroll/master/src/icons/Unfold.svg
 // @grant        none
+// @updateURL  https://raw.githubusercontent.com/Jkker/tampermonkey-auto-scroll/master/dist/auto-scroll.umd.cjs
+// @downloadURL  https://raw.githubusercontent.com/Jkker/tampermonkey-auto-scroll/master/dist/auto-scroll.umd.cjs
 // ==/UserScript==
 
-(function(w,b){typeof exports=="object"&&typeof module<"u"?module.exports=b():typeof define=="function"&&define.amd?define(b):(w=typeof globalThis<"u"?globalThis:w||self,w["auto-scroll"]=b())})(this,function(){"use strict";const w="";function b(){}function oe(e,t){for(const n in t)e[n]=t[n];return e}function G(e){return e()}function W(){return Object.create(null)}function I(e){e.forEach(G)}function R(e){return typeof e=="function"}function J(e,t){return e!=e?t==t:e!==t||e&&typeof e=="object"||typeof e=="function"}let v;function Y(e,t){return v||(v=document.createElement("a")),v.href=t,e===v.href}function re(e){return Object.keys(e).length===0}function ie(e,t,n,o){if(e){const s=Q(e,t,n,o);return e[0](s)}}function Q(e,t,n,o){return e[1]&&o?oe(n.ctx.slice(),e[1](o(t))):n.ctx}function le(e,t,n,o){if(e[2]&&o){const s=e[2](o(n));if(t.dirty===void 0)return s;if(typeof s=="object"){const l=[],i=Math.max(t.dirty.length,s.length);for(let r=0;r<i;r+=1)l[r]=t.dirty[r]|s[r];return l}return t.dirty|s}return t.dirty}function se(e,t,n,o,s,l){if(s){const i=Q(t,n,o,l);e.p(i,s)}}function ue(e){if(e.ctx.length>32){const t=[],n=e.ctx.length/32;for(let o=0;o<n;o++)t[o]=-1;return t}return-1}function ce(e,t){e.appendChild(t)}function _(e,t,n){e.insertBefore(t,n||null)}function g(e){e.parentNode.removeChild(e)}function B(e){return document.createElement(e)}function A(e){return document.createTextNode(e)}function E(){return A(" ")}function fe(e,t,n,o){return e.addEventListener(t,n,o),()=>e.removeEventListener(t,n,o)}function z(e,t,n){n==null?e.removeAttribute(t):e.getAttribute(t)!==n&&e.setAttribute(t,n)}function ae(e){return Array.from(e.childNodes)}function f(e,t,n,o){n===null?e.style.removeProperty(t):e.style.setProperty(t,n,o?"important":"")}let Z;function M(e){Z=e}const C=[],U=[],N=[],V=[],de=Promise.resolve();let P=!1;function ge(){P||(P=!0,de.then(F))}function L(e){N.push(e)}const O=new Set;let T=0;function F(){const e=Z;do{for(;T<C.length;){const t=C[T];T++,M(t),me(t.$$)}for(M(null),C.length=0,T=0;U.length;)U.pop()();for(let t=0;t<N.length;t+=1){const n=N[t];O.has(n)||(O.add(n),n())}N.length=0}while(C.length);for(;V.length;)V.pop()();P=!1,O.clear(),M(e)}function me(e){if(e.fragment!==null){e.update(),I(e.before_update);const t=e.dirty;e.dirty=[-1],e.fragment&&e.fragment.p(e.ctx,t),e.after_update.forEach(L)}}const j=new Set;let h;function _e(){h={r:0,c:[],p:h}}function pe(){h.r||I(h.c),h=h.p}function m(e,t){e&&e.i&&(j.delete(e),e.i(t))}function $(e,t,n,o){if(e&&e.o){if(j.has(e))return;j.add(e),h.c.push(()=>{j.delete(e),o&&(n&&e.d(1),o())}),e.o(t)}else o&&o()}function k(e){e&&e.c()}function D(e,t,n,o){const{fragment:s,on_mount:l,on_destroy:i,after_update:r}=e.$$;s&&s.m(t,n),o||L(()=>{const u=l.map(G).filter(R);i?i.push(...u):I(u),e.$$.on_mount=[]}),r.forEach(L)}function x(e,t){const n=e.$$;n.fragment!==null&&(I(n.on_destroy),n.fragment&&n.fragment.d(t),n.on_destroy=n.fragment=null,n.ctx=[])}function he(e,t){e.$$.dirty[0]===-1&&(C.push(e),ge(),e.$$.dirty.fill(0)),e.$$.dirty[t/31|0]|=1<<t%31}function K(e,t,n,o,s,l,i,r=[-1]){const u=Z;M(e);const c=e.$$={fragment:null,ctx:null,props:l,update:b,not_equal:s,bound:W(),on_mount:[],on_destroy:[],on_disconnect:[],before_update:[],after_update:[],context:new Map(t.context||(u?u.$$.context:[])),callbacks:W(),dirty:r,skip_bound:!1,root:t.target||u.$$.root};i&&i(c.root);let p=!1;if(c.ctx=n?n(e,t.props||{},(a,H,...d)=>{const y=d.length?d[0]:H;return c.ctx&&s(c.ctx[a],c.ctx[a]=y)&&(!c.skip_bound&&c.bound[a]&&c.bound[a](y),p&&he(e,a)),H}):[],c.update(),p=!0,I(c.before_update),c.fragment=o?o(c.ctx):!1,t.target){if(t.hydrate){const a=ae(t.target);c.fragment&&c.fragment.l(a),a.forEach(g)}else c.fragment&&c.fragment.c();t.intro&&m(e.$$.fragment),D(e,t.target,t.anchor,t.customElement),F()}M(u)}class q{$destroy(){x(this,1),this.$destroy=b}$on(t,n){const o=this.$$.callbacks[t]||(this.$$.callbacks[t]=[]);return o.push(n),()=>{const s=o.indexOf(n);s!==-1&&o.splice(s,1)}}$set(t){this.$$set&&!re(t)&&(this.$$.skip_bound=!0,this.$$set(t),this.$$.skip_bound=!1)}}const X="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMTZweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMTZweCIgZmlsbD0iI2ZmZiI+CiAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIiBvcGFjaXR5PSIuODciLz4KICA8cGF0aCBkPSJNMTcuNTEgMy44N0wxNS43MyAyLjEgNS44NCAxMmw5LjkgOS45IDEuNzctMS43N0w5LjM4IDEybDguMTMtOC4xM3oiLz4KPC9zdmc+",ee="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjRweCIgZmlsbD0iI2ZmZiI+CiAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIi8+CiAgPHBhdGggZD0iTTE2IDh2OEg4VjhoOG0yLTJINnYxMmgxMlY2eiIvPgo8L3N2Zz4=",te="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjRweCIgZmlsbD0iI2ZmZiI+CiAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIi8+CiAgPHBhdGggZD0iTTEyIDUuODNMMTUuMTcgOWwxLjQxLTEuNDFMMTIgMyA3LjQxIDcuNTkgOC44MyA5IDEyIDUuODN6bTAgMTIuMzRMOC44MyAxNWwtMS40MSAxLjQxTDEyIDIxbDQuNTktNC41OUwxNS4xNyAxNSAxMiAxOC4xN3oiLz4KPC9zdmc+";function $e(e){let t,n,o,s;const l=e[2].default,i=ie(l,e,e[1],null);return{c(){t=B("button"),i&&i.c(),f(t,"height","40px"),f(t,"padding","8px"),f(t,"display","flex"),f(t,"justify-content","center"),f(t,"align-items","center"),f(t,"border","none"),f(t,"outline","none"),f(t,"background","transparent"),f(t,"cursor","pointer")},m(r,u){_(r,t,u),i&&i.m(t,null),n=!0,o||(s=fe(t,"click",function(){R(e[0])&&e[0].apply(this,arguments)}),o=!0)},p(r,[u]){e=r,i&&i.p&&(!n||u&2)&&se(i,l,e,e[1],n?le(l,e[1],u,null):ue(e[1]),null)},i(r){n||(m(i,r),n=!0)},o(r){$(i,r),n=!1},d(r){r&&g(t),i&&i.d(r),o=!1,s()}}}function be(e,t,n){let{$$slots:o={},$$scope:s}=t,{onClick:l}=t;return e.$$set=i=>{"onClick"in i&&n(0,l=i.onClick),"$$scope"in i&&n(1,s=i.$$scope)},[l,s,o]}class S extends q{constructor(t){super(),K(this,t,be,$e,J,{onClick:0})}}function ne(e){let t,n,o,s,l,i;return t=new S({props:{onClick:e[4]("resize"),$$slots:{default:[ye]},$$scope:{ctx:e}}}),o=new S({props:{onClick:e[4]("interval",500),$$slots:{default:[Ie]},$$scope:{ctx:e}}}),l=new S({props:{onClick:e[4]("interval",1500),$$slots:{default:[Me]},$$scope:{ctx:e}}}),{c(){k(t.$$.fragment),n=E(),k(o.$$.fragment),s=E(),k(l.$$.fragment)},m(r,u){D(t,r,u),_(r,n,u),D(o,r,u),_(r,s,u),D(l,r,u),i=!0},p(r,u){const c={};u&1024&&(c.$$scope={dirty:u,ctx:r}),t.$set(c);const p={};u&1024&&(p.$$scope={dirty:u,ctx:r}),o.$set(p);const a={};u&1024&&(a.$$scope={dirty:u,ctx:r}),l.$set(a)},i(r){i||(m(t.$$.fragment,r),m(o.$$.fragment,r),m(l.$$.fragment,r),i=!0)},o(r){$(t.$$.fragment,r),$(o.$$.fragment,r),$(l.$$.fragment,r),i=!1},d(r){x(t,r),r&&g(n),x(o,r),r&&g(s),x(l,r)}}}function ye(e){let t;return{c(){t=A("Auto")},m(n,o){_(n,t,o)},d(n){n&&g(t)}}}function Ie(e){let t;return{c(){t=A("500ms")},m(n,o){_(n,t,o)},d(n){n&&g(t)}}}function Me(e){let t;return{c(){t=A("1.5s")},m(n,o){_(n,t,o)},d(n){n&&g(t)}}}function Ce(e){let t,n;return{c(){t=B("img"),Y(t.src,n=e[1]?ee:e[0]?X:te)||z(t,"src",n),z(t,"alt","Logo")},m(o,s){_(o,t,s)},p(o,s){s&3&&!Y(t.src,n=o[1]?ee:o[0]?X:te)&&z(t,"src",n)},d(o){o&&g(t)}}}function De(e){let t,n,o,s,l=e[0]&&ne(e);return o=new S({props:{onClick:e[1]?e[3]:e[2],$$slots:{default:[Ce]},$$scope:{ctx:e}}}),{c(){t=B("div"),l&&l.c(),n=E(),k(o.$$.fragment),f(t,"position","fixed"),f(t,"bottom","16px"),f(t,"left","0"),f(t,"z-index","99999999"),f(t,"background","#333333aa"),f(t,"backdrop-filter","blur(10px)"),f(t,"display","flex"),f(t,"border-radius","0 20px 20px 0")},m(i,r){_(i,t,r),l&&l.m(t,null),ce(t,n),D(o,t,null),s=!0},p(i,[r]){i[0]?l?(l.p(i,r),r&1&&m(l,1)):(l=ne(i),l.c(),m(l,1),l.m(t,n)):l&&(_e(),$(l,1,1,()=>{l=null}),pe());const u={};r&2&&(u.onClick=i[1]?i[3]:i[2]),r&1027&&(u.$$scope={dirty:r,ctx:i}),o.$set(u)},i(i){s||(m(l),m(o.$$.fragment,i),s=!0)},o(i){$(l),$(o.$$.fragment,i),s=!1},d(i){i&&g(t),l&&l.d(),x(o)}}}function xe(e,t,n){let o=!1;function s(){n(0,o=!o)}const l=()=>window.scroll({top:document.body.scrollHeight,left:0,behavior:"smooth"}),i=new ResizeObserver(()=>l());let r,u=!1;const c=(d,y=1e3)=>{d==="resize"?i.observe(document.body):d==="interval"&&(r=setInterval(l,y)),n(1,u=d),n(0,o=!o)},p=d=>{d==="resize"?i.unobserve(document.body):d==="interval"&&clearInterval(r),n(1,u=!1)};return[o,u,s,()=>{u&&p(u)},(d,y=1e3)=>()=>{u?p(d):c(d,y)}]}class we extends q{constructor(t){super(),K(this,t,xe,De,J,{})}}return new we({target:document.body})});
+(function(global, factory) {
+  typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory() : typeof define === "function" && define.amd ? define(factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global["auto-scroll"] = factory());
+})(this, function() {
+  "use strict";
+  const app = "";
+  function noop() {
+  }
+  function assign(tar, src) {
+    for (const k in src)
+      tar[k] = src[k];
+    return tar;
+  }
+  function run(fn) {
+    return fn();
+  }
+  function blank_object() {
+    return /* @__PURE__ */ Object.create(null);
+  }
+  function run_all(fns) {
+    fns.forEach(run);
+  }
+  function is_function(thing) {
+    return typeof thing === "function";
+  }
+  function safe_not_equal(a, b) {
+    return a != a ? b == b : a !== b || (a && typeof a === "object" || typeof a === "function");
+  }
+  let src_url_equal_anchor;
+  function src_url_equal(element_src, url) {
+    if (!src_url_equal_anchor) {
+      src_url_equal_anchor = document.createElement("a");
+    }
+    src_url_equal_anchor.href = url;
+    return element_src === src_url_equal_anchor.href;
+  }
+  function is_empty(obj) {
+    return Object.keys(obj).length === 0;
+  }
+  function create_slot(definition, ctx, $$scope, fn) {
+    if (definition) {
+      const slot_ctx = get_slot_context(definition, ctx, $$scope, fn);
+      return definition[0](slot_ctx);
+    }
+  }
+  function get_slot_context(definition, ctx, $$scope, fn) {
+    return definition[1] && fn ? assign($$scope.ctx.slice(), definition[1](fn(ctx))) : $$scope.ctx;
+  }
+  function get_slot_changes(definition, $$scope, dirty, fn) {
+    if (definition[2] && fn) {
+      const lets = definition[2](fn(dirty));
+      if ($$scope.dirty === void 0) {
+        return lets;
+      }
+      if (typeof lets === "object") {
+        const merged = [];
+        const len = Math.max($$scope.dirty.length, lets.length);
+        for (let i = 0; i < len; i += 1) {
+          merged[i] = $$scope.dirty[i] | lets[i];
+        }
+        return merged;
+      }
+      return $$scope.dirty | lets;
+    }
+    return $$scope.dirty;
+  }
+  function update_slot_base(slot, slot_definition, ctx, $$scope, slot_changes, get_slot_context_fn) {
+    if (slot_changes) {
+      const slot_context = get_slot_context(slot_definition, ctx, $$scope, get_slot_context_fn);
+      slot.p(slot_context, slot_changes);
+    }
+  }
+  function get_all_dirty_from_scope($$scope) {
+    if ($$scope.ctx.length > 32) {
+      const dirty = [];
+      const length = $$scope.ctx.length / 32;
+      for (let i = 0; i < length; i++) {
+        dirty[i] = -1;
+      }
+      return dirty;
+    }
+    return -1;
+  }
+  function append(target, node) {
+    target.appendChild(node);
+  }
+  function insert(target, node, anchor) {
+    target.insertBefore(node, anchor || null);
+  }
+  function detach(node) {
+    node.parentNode.removeChild(node);
+  }
+  function element(name) {
+    return document.createElement(name);
+  }
+  function text(data) {
+    return document.createTextNode(data);
+  }
+  function space() {
+    return text(" ");
+  }
+  function listen(node, event, handler, options) {
+    node.addEventListener(event, handler, options);
+    return () => node.removeEventListener(event, handler, options);
+  }
+  function attr(node, attribute, value) {
+    if (value == null)
+      node.removeAttribute(attribute);
+    else if (node.getAttribute(attribute) !== value)
+      node.setAttribute(attribute, value);
+  }
+  function children(element2) {
+    return Array.from(element2.childNodes);
+  }
+  function set_style(node, key, value, important) {
+    if (value === null) {
+      node.style.removeProperty(key);
+    } else {
+      node.style.setProperty(key, value, important ? "important" : "");
+    }
+  }
+  let current_component;
+  function set_current_component(component) {
+    current_component = component;
+  }
+  const dirty_components = [];
+  const binding_callbacks = [];
+  const render_callbacks = [];
+  const flush_callbacks = [];
+  const resolved_promise = Promise.resolve();
+  let update_scheduled = false;
+  function schedule_update() {
+    if (!update_scheduled) {
+      update_scheduled = true;
+      resolved_promise.then(flush);
+    }
+  }
+  function add_render_callback(fn) {
+    render_callbacks.push(fn);
+  }
+  const seen_callbacks = /* @__PURE__ */ new Set();
+  let flushidx = 0;
+  function flush() {
+    const saved_component = current_component;
+    do {
+      while (flushidx < dirty_components.length) {
+        const component = dirty_components[flushidx];
+        flushidx++;
+        set_current_component(component);
+        update(component.$$);
+      }
+      set_current_component(null);
+      dirty_components.length = 0;
+      flushidx = 0;
+      while (binding_callbacks.length)
+        binding_callbacks.pop()();
+      for (let i = 0; i < render_callbacks.length; i += 1) {
+        const callback = render_callbacks[i];
+        if (!seen_callbacks.has(callback)) {
+          seen_callbacks.add(callback);
+          callback();
+        }
+      }
+      render_callbacks.length = 0;
+    } while (dirty_components.length);
+    while (flush_callbacks.length) {
+      flush_callbacks.pop()();
+    }
+    update_scheduled = false;
+    seen_callbacks.clear();
+    set_current_component(saved_component);
+  }
+  function update($$) {
+    if ($$.fragment !== null) {
+      $$.update();
+      run_all($$.before_update);
+      const dirty = $$.dirty;
+      $$.dirty = [-1];
+      $$.fragment && $$.fragment.p($$.ctx, dirty);
+      $$.after_update.forEach(add_render_callback);
+    }
+  }
+  const outroing = /* @__PURE__ */ new Set();
+  let outros;
+  function group_outros() {
+    outros = {
+      r: 0,
+      c: [],
+      p: outros
+    };
+  }
+  function check_outros() {
+    if (!outros.r) {
+      run_all(outros.c);
+    }
+    outros = outros.p;
+  }
+  function transition_in(block, local) {
+    if (block && block.i) {
+      outroing.delete(block);
+      block.i(local);
+    }
+  }
+  function transition_out(block, local, detach2, callback) {
+    if (block && block.o) {
+      if (outroing.has(block))
+        return;
+      outroing.add(block);
+      outros.c.push(() => {
+        outroing.delete(block);
+        if (callback) {
+          if (detach2)
+            block.d(1);
+          callback();
+        }
+      });
+      block.o(local);
+    } else if (callback) {
+      callback();
+    }
+  }
+  function create_component(block) {
+    block && block.c();
+  }
+  function mount_component(component, target, anchor, customElement) {
+    const { fragment, on_mount, on_destroy, after_update } = component.$$;
+    fragment && fragment.m(target, anchor);
+    if (!customElement) {
+      add_render_callback(() => {
+        const new_on_destroy = on_mount.map(run).filter(is_function);
+        if (on_destroy) {
+          on_destroy.push(...new_on_destroy);
+        } else {
+          run_all(new_on_destroy);
+        }
+        component.$$.on_mount = [];
+      });
+    }
+    after_update.forEach(add_render_callback);
+  }
+  function destroy_component(component, detaching) {
+    const $$ = component.$$;
+    if ($$.fragment !== null) {
+      run_all($$.on_destroy);
+      $$.fragment && $$.fragment.d(detaching);
+      $$.on_destroy = $$.fragment = null;
+      $$.ctx = [];
+    }
+  }
+  function make_dirty(component, i) {
+    if (component.$$.dirty[0] === -1) {
+      dirty_components.push(component);
+      schedule_update();
+      component.$$.dirty.fill(0);
+    }
+    component.$$.dirty[i / 31 | 0] |= 1 << i % 31;
+  }
+  function init(component, options, instance2, create_fragment2, not_equal, props, append_styles, dirty = [-1]) {
+    const parent_component = current_component;
+    set_current_component(component);
+    const $$ = component.$$ = {
+      fragment: null,
+      ctx: null,
+      props,
+      update: noop,
+      not_equal,
+      bound: blank_object(),
+      on_mount: [],
+      on_destroy: [],
+      on_disconnect: [],
+      before_update: [],
+      after_update: [],
+      context: new Map(options.context || (parent_component ? parent_component.$$.context : [])),
+      callbacks: blank_object(),
+      dirty,
+      skip_bound: false,
+      root: options.target || parent_component.$$.root
+    };
+    append_styles && append_styles($$.root);
+    let ready = false;
+    $$.ctx = instance2 ? instance2(component, options.props || {}, (i, ret, ...rest) => {
+      const value = rest.length ? rest[0] : ret;
+      if ($$.ctx && not_equal($$.ctx[i], $$.ctx[i] = value)) {
+        if (!$$.skip_bound && $$.bound[i])
+          $$.bound[i](value);
+        if (ready)
+          make_dirty(component, i);
+      }
+      return ret;
+    }) : [];
+    $$.update();
+    ready = true;
+    run_all($$.before_update);
+    $$.fragment = create_fragment2 ? create_fragment2($$.ctx) : false;
+    if (options.target) {
+      if (options.hydrate) {
+        const nodes = children(options.target);
+        $$.fragment && $$.fragment.l(nodes);
+        nodes.forEach(detach);
+      } else {
+        $$.fragment && $$.fragment.c();
+      }
+      if (options.intro)
+        transition_in(component.$$.fragment);
+      mount_component(component, options.target, options.anchor, options.customElement);
+      flush();
+    }
+    set_current_component(parent_component);
+  }
+  class SvelteComponent {
+    $destroy() {
+      destroy_component(this, 1);
+      this.$destroy = noop;
+    }
+    $on(type, callback) {
+      const callbacks = this.$$.callbacks[type] || (this.$$.callbacks[type] = []);
+      callbacks.push(callback);
+      return () => {
+        const index = callbacks.indexOf(callback);
+        if (index !== -1)
+          callbacks.splice(index, 1);
+      };
+    }
+    $set($$props) {
+      if (this.$$set && !is_empty($$props)) {
+        this.$$.skip_bound = true;
+        this.$$set($$props);
+        this.$$.skip_bound = false;
+      }
+    }
+  }
+  const ArrowBackIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMTZweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMTZweCIgZmlsbD0iI2ZmZiI+CiAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIiBvcGFjaXR5PSIuODciLz4KICA8cGF0aCBkPSJNMTcuNTEgMy44N0wxNS43MyAyLjEgNS44NCAxMmw5LjkgOS45IDEuNzctMS43N0w5LjM4IDEybDguMTMtOC4xM3oiLz4KPC9zdmc+";
+  const StopIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjRweCIgZmlsbD0iI2ZmZiI+CiAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIi8+CiAgPHBhdGggZD0iTTE2IDh2OEg4VjhoOG0yLTJINnYxMmgxMlY2eiIvPgo8L3N2Zz4=";
+  const AutoScrollIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjRweCIgZmlsbD0iI2ZmZiI+CiAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIi8+CiAgPHBhdGggZD0iTTEyIDUuODNMMTUuMTcgOWwxLjQxLTEuNDFMMTIgMyA3LjQxIDcuNTkgOC44MyA5IDEyIDUuODN6bTAgMTIuMzRMOC44MyAxNWwtMS40MSAxLjQxTDEyIDIxbDQuNTktNC41OUwxNS4xNyAxNSAxMiAxOC4xN3oiLz4KPC9zdmc+";
+  function create_fragment$1(ctx) {
+    let button;
+    let current;
+    let mounted;
+    let dispose;
+    const default_slot_template = ctx[2].default;
+    const default_slot = create_slot(default_slot_template, ctx, ctx[1], null);
+    return {
+      c() {
+        button = element("button");
+        if (default_slot)
+          default_slot.c();
+        set_style(button, "height", "40px");
+        set_style(button, "padding", "8px");
+        set_style(button, "display", "flex");
+        set_style(button, "justify-content", "center");
+        set_style(button, "align-items", "center");
+        set_style(button, "border", "none");
+        set_style(button, "outline", "none");
+        set_style(button, "background", "transparent");
+        set_style(button, "cursor", "pointer");
+      },
+      m(target, anchor) {
+        insert(target, button, anchor);
+        if (default_slot) {
+          default_slot.m(button, null);
+        }
+        current = true;
+        if (!mounted) {
+          dispose = listen(button, "click", function() {
+            if (is_function(ctx[0]))
+              ctx[0].apply(this, arguments);
+          });
+          mounted = true;
+        }
+      },
+      p(new_ctx, [dirty]) {
+        ctx = new_ctx;
+        if (default_slot) {
+          if (default_slot.p && (!current || dirty & 2)) {
+            update_slot_base(
+              default_slot,
+              default_slot_template,
+              ctx,
+              ctx[1],
+              !current ? get_all_dirty_from_scope(ctx[1]) : get_slot_changes(default_slot_template, ctx[1], dirty, null),
+              null
+            );
+          }
+        }
+      },
+      i(local) {
+        if (current)
+          return;
+        transition_in(default_slot, local);
+        current = true;
+      },
+      o(local) {
+        transition_out(default_slot, local);
+        current = false;
+      },
+      d(detaching) {
+        if (detaching)
+          detach(button);
+        if (default_slot)
+          default_slot.d(detaching);
+        mounted = false;
+        dispose();
+      }
+    };
+  }
+  function instance$1($$self, $$props, $$invalidate) {
+    let { $$slots: slots = {}, $$scope } = $$props;
+    let { onClick } = $$props;
+    $$self.$$set = ($$props2) => {
+      if ("onClick" in $$props2)
+        $$invalidate(0, onClick = $$props2.onClick);
+      if ("$$scope" in $$props2)
+        $$invalidate(1, $$scope = $$props2.$$scope);
+    };
+    return [onClick, $$scope, slots];
+  }
+  class Button extends SvelteComponent {
+    constructor(options) {
+      super();
+      init(this, options, instance$1, create_fragment$1, safe_not_equal, { onClick: 0 });
+    }
+  }
+  function create_if_block(ctx) {
+    let button0;
+    let t0;
+    let button1;
+    let t1;
+    let button2;
+    let current;
+    button0 = new Button({
+      props: {
+        onClick: ctx[4]("resize"),
+        $$slots: { default: [create_default_slot_3] },
+        $$scope: { ctx }
+      }
+    });
+    button1 = new Button({
+      props: {
+        onClick: ctx[4]("interval", 500),
+        $$slots: { default: [create_default_slot_2] },
+        $$scope: { ctx }
+      }
+    });
+    button2 = new Button({
+      props: {
+        onClick: ctx[4]("interval", 1500),
+        $$slots: { default: [create_default_slot_1] },
+        $$scope: { ctx }
+      }
+    });
+    return {
+      c() {
+        create_component(button0.$$.fragment);
+        t0 = space();
+        create_component(button1.$$.fragment);
+        t1 = space();
+        create_component(button2.$$.fragment);
+      },
+      m(target, anchor) {
+        mount_component(button0, target, anchor);
+        insert(target, t0, anchor);
+        mount_component(button1, target, anchor);
+        insert(target, t1, anchor);
+        mount_component(button2, target, anchor);
+        current = true;
+      },
+      p(ctx2, dirty) {
+        const button0_changes = {};
+        if (dirty & 1024) {
+          button0_changes.$$scope = { dirty, ctx: ctx2 };
+        }
+        button0.$set(button0_changes);
+        const button1_changes = {};
+        if (dirty & 1024) {
+          button1_changes.$$scope = { dirty, ctx: ctx2 };
+        }
+        button1.$set(button1_changes);
+        const button2_changes = {};
+        if (dirty & 1024) {
+          button2_changes.$$scope = { dirty, ctx: ctx2 };
+        }
+        button2.$set(button2_changes);
+      },
+      i(local) {
+        if (current)
+          return;
+        transition_in(button0.$$.fragment, local);
+        transition_in(button1.$$.fragment, local);
+        transition_in(button2.$$.fragment, local);
+        current = true;
+      },
+      o(local) {
+        transition_out(button0.$$.fragment, local);
+        transition_out(button1.$$.fragment, local);
+        transition_out(button2.$$.fragment, local);
+        current = false;
+      },
+      d(detaching) {
+        destroy_component(button0, detaching);
+        if (detaching)
+          detach(t0);
+        destroy_component(button1, detaching);
+        if (detaching)
+          detach(t1);
+        destroy_component(button2, detaching);
+      }
+    };
+  }
+  function create_default_slot_3(ctx) {
+    let t;
+    return {
+      c() {
+        t = text("Auto");
+      },
+      m(target, anchor) {
+        insert(target, t, anchor);
+      },
+      d(detaching) {
+        if (detaching)
+          detach(t);
+      }
+    };
+  }
+  function create_default_slot_2(ctx) {
+    let t;
+    return {
+      c() {
+        t = text("500ms");
+      },
+      m(target, anchor) {
+        insert(target, t, anchor);
+      },
+      d(detaching) {
+        if (detaching)
+          detach(t);
+      }
+    };
+  }
+  function create_default_slot_1(ctx) {
+    let t;
+    return {
+      c() {
+        t = text("1.5s");
+      },
+      m(target, anchor) {
+        insert(target, t, anchor);
+      },
+      d(detaching) {
+        if (detaching)
+          detach(t);
+      }
+    };
+  }
+  function create_default_slot(ctx) {
+    let img;
+    let img_src_value;
+    return {
+      c() {
+        img = element("img");
+        if (!src_url_equal(img.src, img_src_value = ctx[1] ? StopIcon : ctx[0] ? ArrowBackIcon : AutoScrollIcon))
+          attr(img, "src", img_src_value);
+        attr(img, "alt", "Logo");
+      },
+      m(target, anchor) {
+        insert(target, img, anchor);
+      },
+      p(ctx2, dirty) {
+        if (dirty & 3 && !src_url_equal(img.src, img_src_value = ctx2[1] ? StopIcon : ctx2[0] ? ArrowBackIcon : AutoScrollIcon)) {
+          attr(img, "src", img_src_value);
+        }
+      },
+      d(detaching) {
+        if (detaching)
+          detach(img);
+      }
+    };
+  }
+  function create_fragment(ctx) {
+    let div;
+    let t;
+    let button;
+    let current;
+    let if_block = ctx[0] && create_if_block(ctx);
+    button = new Button({
+      props: {
+        onClick: ctx[1] ? ctx[3] : ctx[2],
+        $$slots: { default: [create_default_slot] },
+        $$scope: { ctx }
+      }
+    });
+    return {
+      c() {
+        div = element("div");
+        if (if_block)
+          if_block.c();
+        t = space();
+        create_component(button.$$.fragment);
+        set_style(div, "position", "fixed");
+        set_style(div, "bottom", "16px");
+        set_style(div, "left", "0");
+        set_style(div, "z-index", "99999999");
+        set_style(div, "background", "#333333aa");
+        set_style(div, "backdrop-filter", "blur(10px)");
+        set_style(div, "display", "flex");
+        set_style(div, "border-radius", "0 20px 20px 0");
+      },
+      m(target, anchor) {
+        insert(target, div, anchor);
+        if (if_block)
+          if_block.m(div, null);
+        append(div, t);
+        mount_component(button, div, null);
+        current = true;
+      },
+      p(ctx2, [dirty]) {
+        if (ctx2[0]) {
+          if (if_block) {
+            if_block.p(ctx2, dirty);
+            if (dirty & 1) {
+              transition_in(if_block, 1);
+            }
+          } else {
+            if_block = create_if_block(ctx2);
+            if_block.c();
+            transition_in(if_block, 1);
+            if_block.m(div, t);
+          }
+        } else if (if_block) {
+          group_outros();
+          transition_out(if_block, 1, 1, () => {
+            if_block = null;
+          });
+          check_outros();
+        }
+        const button_changes = {};
+        if (dirty & 2)
+          button_changes.onClick = ctx2[1] ? ctx2[3] : ctx2[2];
+        if (dirty & 1027) {
+          button_changes.$$scope = { dirty, ctx: ctx2 };
+        }
+        button.$set(button_changes);
+      },
+      i(local) {
+        if (current)
+          return;
+        transition_in(if_block);
+        transition_in(button.$$.fragment, local);
+        current = true;
+      },
+      o(local) {
+        transition_out(if_block);
+        transition_out(button.$$.fragment, local);
+        current = false;
+      },
+      d(detaching) {
+        if (detaching)
+          detach(div);
+        if (if_block)
+          if_block.d();
+        destroy_component(button);
+      }
+    };
+  }
+  function instance($$self, $$props, $$invalidate) {
+    let open = false;
+    function toggleMenu() {
+      $$invalidate(0, open = !open);
+    }
+    const scroll = () => window.scroll({
+      top: document.body.scrollHeight,
+      left: 0,
+      behavior: "smooth"
+    });
+    const resizeObserver = new ResizeObserver(() => scroll());
+    let intervalId;
+    let scrolling = false;
+    const startScroll = (type, interval = 1e3) => {
+      if (type === "resize")
+        resizeObserver.observe(document.body);
+      else if (type === "interval")
+        intervalId = setInterval(scroll, interval);
+      $$invalidate(1, scrolling = type);
+      $$invalidate(0, open = !open);
+    };
+    const cancelScroll = (type) => {
+      if (type === "resize")
+        resizeObserver.unobserve(document.body);
+      else if (type === "interval")
+        clearInterval(intervalId);
+      $$invalidate(1, scrolling = false);
+    };
+    const cancelCurrentScroll = () => {
+      if (scrolling)
+        cancelScroll(scrolling);
+    };
+    const toggleScroll = (type, intervalSecond = 1e3) => () => {
+      if (scrolling) {
+        cancelScroll(type);
+      } else {
+        startScroll(type, intervalSecond);
+      }
+    };
+    return [open, scrolling, toggleMenu, cancelCurrentScroll, toggleScroll];
+  }
+  class App extends SvelteComponent {
+    constructor(options) {
+      super();
+      init(this, options, instance, create_fragment, safe_not_equal, {});
+    }
+  }
+  const main = new App({
+    target: document.body
+  });
+  return main;
+});

@@ -2,457 +2,724 @@
 // @name         Auto Scroll Button
 // @namespace    https://github.com/Jkker/tampermonkey-auto-scroll
 // @version      1.0
-// @description  Auto scroll down the page
+// @description  Adds a button to auto scroll down the page when new content is loaded or by a interval
 // @author       Jkker
+// @license MIT
 // @match        *://*/*
 // @icon         https://raw.githubusercontent.com/Jkker/tampermonkey-auto-scroll/master/src/icons/Unfold.svg
 // @grant        none
+// @updateURL  https://raw.githubusercontent.com/Jkker/tampermonkey-auto-scroll/master/dist/auto-scroll.umd.cjs
+// @downloadURL  https://raw.githubusercontent.com/Jkker/tampermonkey-auto-scroll/master/dist/auto-scroll.umd.cjs
 // ==/UserScript==
 
-function U() {
+const app = "";
+function noop() {
 }
-function nt(t, e) {
-  for (const n in e)
-    t[n] = e[n];
-  return t;
+function assign(tar, src) {
+  for (const k in src)
+    tar[k] = src[k];
+  return tar;
 }
-function V(t) {
-  return t();
+function run(fn) {
+  return fn();
 }
-function O() {
+function blank_object() {
   return /* @__PURE__ */ Object.create(null);
 }
-function D(t) {
-  t.forEach(V);
+function run_all(fns) {
+  fns.forEach(run);
 }
-function F(t) {
-  return typeof t == "function";
+function is_function(thing) {
+  return typeof thing === "function";
 }
-function K(t, e) {
-  return t != t ? e == e : t !== e || t && typeof t == "object" || typeof t == "function";
+function safe_not_equal(a, b) {
+  return a != a ? b == b : a !== b || (a && typeof a === "object" || typeof a === "function");
 }
-let w;
-function H(t, e) {
-  return w || (w = document.createElement("a")), w.href = e, t === w.href;
+let src_url_equal_anchor;
+function src_url_equal(element_src, url) {
+  if (!src_url_equal_anchor) {
+    src_url_equal_anchor = document.createElement("a");
+  }
+  src_url_equal_anchor.href = url;
+  return element_src === src_url_equal_anchor.href;
 }
-function rt(t) {
-  return Object.keys(t).length === 0;
+function is_empty(obj) {
+  return Object.keys(obj).length === 0;
 }
-function ot(t, e, n, r) {
-  if (t) {
-    const s = q(t, e, n, r);
-    return t[0](s);
+function create_slot(definition, ctx, $$scope, fn) {
+  if (definition) {
+    const slot_ctx = get_slot_context(definition, ctx, $$scope, fn);
+    return definition[0](slot_ctx);
   }
 }
-function q(t, e, n, r) {
-  return t[1] && r ? nt(n.ctx.slice(), t[1](r(e))) : n.ctx;
+function get_slot_context(definition, ctx, $$scope, fn) {
+  return definition[1] && fn ? assign($$scope.ctx.slice(), definition[1](fn(ctx))) : $$scope.ctx;
 }
-function it(t, e, n, r) {
-  if (t[2] && r) {
-    const s = t[2](r(n));
-    if (e.dirty === void 0)
-      return s;
-    if (typeof s == "object") {
-      const l = [], i = Math.max(e.dirty.length, s.length);
-      for (let o = 0; o < i; o += 1)
-        l[o] = e.dirty[o] | s[o];
-      return l;
+function get_slot_changes(definition, $$scope, dirty, fn) {
+  if (definition[2] && fn) {
+    const lets = definition[2](fn(dirty));
+    if ($$scope.dirty === void 0) {
+      return lets;
     }
-    return e.dirty | s;
+    if (typeof lets === "object") {
+      const merged = [];
+      const len = Math.max($$scope.dirty.length, lets.length);
+      for (let i = 0; i < len; i += 1) {
+        merged[i] = $$scope.dirty[i] | lets[i];
+      }
+      return merged;
+    }
+    return $$scope.dirty | lets;
   }
-  return e.dirty;
+  return $$scope.dirty;
 }
-function lt(t, e, n, r, s, l) {
-  if (s) {
-    const i = q(e, n, r, l);
-    t.p(i, s);
+function update_slot_base(slot, slot_definition, ctx, $$scope, slot_changes, get_slot_context_fn) {
+  if (slot_changes) {
+    const slot_context = get_slot_context(slot_definition, ctx, $$scope, get_slot_context_fn);
+    slot.p(slot_context, slot_changes);
   }
 }
-function st(t) {
-  if (t.ctx.length > 32) {
-    const e = [], n = t.ctx.length / 32;
-    for (let r = 0; r < n; r++)
-      e[r] = -1;
-    return e;
+function get_all_dirty_from_scope($$scope) {
+  if ($$scope.ctx.length > 32) {
+    const dirty = [];
+    const length = $$scope.ctx.length / 32;
+    for (let i = 0; i < length; i++) {
+      dirty[i] = -1;
+    }
+    return dirty;
   }
   return -1;
 }
-function ut(t, e) {
-  t.appendChild(e);
+function append(target, node) {
+  target.appendChild(node);
 }
-function p(t, e, n) {
-  t.insertBefore(e, n || null);
+function insert(target, node, anchor) {
+  target.insertBefore(node, anchor || null);
 }
-function m(t) {
-  t.parentNode.removeChild(t);
+function detach(node) {
+  node.parentNode.removeChild(node);
 }
-function P(t) {
-  return document.createElement(t);
+function element(name) {
+  return document.createElement(name);
 }
-function j(t) {
-  return document.createTextNode(t);
+function text(data) {
+  return document.createTextNode(data);
 }
-function E() {
-  return j(" ");
+function space() {
+  return text(" ");
 }
-function ct(t, e, n, r) {
-  return t.addEventListener(e, n, r), () => t.removeEventListener(e, n, r);
+function listen(node, event, handler, options) {
+  node.addEventListener(event, handler, options);
+  return () => node.removeEventListener(event, handler, options);
 }
-function S(t, e, n) {
-  n == null ? t.removeAttribute(e) : t.getAttribute(e) !== n && t.setAttribute(e, n);
+function attr(node, attribute, value) {
+  if (value == null)
+    node.removeAttribute(attribute);
+  else if (node.getAttribute(attribute) !== value)
+    node.setAttribute(attribute, value);
 }
-function ft(t) {
-  return Array.from(t.childNodes);
+function children(element2) {
+  return Array.from(element2.childNodes);
 }
-function f(t, e, n, r) {
-  n === null ? t.style.removeProperty(e) : t.style.setProperty(e, n, r ? "important" : "");
-}
-let L;
-function y(t) {
-  L = t;
-}
-const b = [], G = [], v = [], W = [], at = Promise.resolve();
-let z = !1;
-function dt() {
-  z || (z = !0, at.then(X));
-}
-function Z(t) {
-  v.push(t);
-}
-const B = /* @__PURE__ */ new Set();
-let x = 0;
-function X() {
-  const t = L;
-  do {
-    for (; x < b.length; ) {
-      const e = b[x];
-      x++, y(e), gt(e.$$);
-    }
-    for (y(null), b.length = 0, x = 0; G.length; )
-      G.pop()();
-    for (let e = 0; e < v.length; e += 1) {
-      const n = v[e];
-      B.has(n) || (B.add(n), n());
-    }
-    v.length = 0;
-  } while (b.length);
-  for (; W.length; )
-    W.pop()();
-  z = !1, B.clear(), y(t);
-}
-function gt(t) {
-  if (t.fragment !== null) {
-    t.update(), D(t.before_update);
-    const e = t.dirty;
-    t.dirty = [-1], t.fragment && t.fragment.p(t.ctx, e), t.after_update.forEach(Z);
+function set_style(node, key, value, important) {
+  if (value === null) {
+    node.style.removeProperty(key);
+  } else {
+    node.style.setProperty(key, value, important ? "important" : "");
   }
 }
-const A = /* @__PURE__ */ new Set();
-let h;
-function mt() {
-  h = {
+let current_component;
+function set_current_component(component) {
+  current_component = component;
+}
+const dirty_components = [];
+const binding_callbacks = [];
+const render_callbacks = [];
+const flush_callbacks = [];
+const resolved_promise = Promise.resolve();
+let update_scheduled = false;
+function schedule_update() {
+  if (!update_scheduled) {
+    update_scheduled = true;
+    resolved_promise.then(flush);
+  }
+}
+function add_render_callback(fn) {
+  render_callbacks.push(fn);
+}
+const seen_callbacks = /* @__PURE__ */ new Set();
+let flushidx = 0;
+function flush() {
+  const saved_component = current_component;
+  do {
+    while (flushidx < dirty_components.length) {
+      const component = dirty_components[flushidx];
+      flushidx++;
+      set_current_component(component);
+      update(component.$$);
+    }
+    set_current_component(null);
+    dirty_components.length = 0;
+    flushidx = 0;
+    while (binding_callbacks.length)
+      binding_callbacks.pop()();
+    for (let i = 0; i < render_callbacks.length; i += 1) {
+      const callback = render_callbacks[i];
+      if (!seen_callbacks.has(callback)) {
+        seen_callbacks.add(callback);
+        callback();
+      }
+    }
+    render_callbacks.length = 0;
+  } while (dirty_components.length);
+  while (flush_callbacks.length) {
+    flush_callbacks.pop()();
+  }
+  update_scheduled = false;
+  seen_callbacks.clear();
+  set_current_component(saved_component);
+}
+function update($$) {
+  if ($$.fragment !== null) {
+    $$.update();
+    run_all($$.before_update);
+    const dirty = $$.dirty;
+    $$.dirty = [-1];
+    $$.fragment && $$.fragment.p($$.ctx, dirty);
+    $$.after_update.forEach(add_render_callback);
+  }
+}
+const outroing = /* @__PURE__ */ new Set();
+let outros;
+function group_outros() {
+  outros = {
     r: 0,
     c: [],
-    p: h
+    p: outros
   };
 }
-function _t() {
-  h.r || D(h.c), h = h.p;
+function check_outros() {
+  if (!outros.r) {
+    run_all(outros.c);
+  }
+  outros = outros.p;
 }
-function g(t, e) {
-  t && t.i && (A.delete(t), t.i(e));
+function transition_in(block, local) {
+  if (block && block.i) {
+    outroing.delete(block);
+    block.i(local);
+  }
 }
-function $(t, e, n, r) {
-  if (t && t.o) {
-    if (A.has(t))
+function transition_out(block, local, detach2, callback) {
+  if (block && block.o) {
+    if (outroing.has(block))
       return;
-    A.add(t), h.c.push(() => {
-      A.delete(t), r && (n && t.d(1), r());
-    }), t.o(e);
-  } else
-    r && r();
+    outroing.add(block);
+    outros.c.push(() => {
+      outroing.delete(block);
+      if (callback) {
+        if (detach2)
+          block.d(1);
+        callback();
+      }
+    });
+    block.o(local);
+  } else if (callback) {
+    callback();
+  }
 }
-function N(t) {
-  t && t.c();
+function create_component(block) {
+  block && block.c();
 }
-function M(t, e, n, r) {
-  const { fragment: s, on_mount: l, on_destroy: i, after_update: o } = t.$$;
-  s && s.m(e, n), r || Z(() => {
-    const u = l.map(V).filter(F);
-    i ? i.push(...u) : D(u), t.$$.on_mount = [];
-  }), o.forEach(Z);
+function mount_component(component, target, anchor, customElement) {
+  const { fragment, on_mount, on_destroy, after_update } = component.$$;
+  fragment && fragment.m(target, anchor);
+  if (!customElement) {
+    add_render_callback(() => {
+      const new_on_destroy = on_mount.map(run).filter(is_function);
+      if (on_destroy) {
+        on_destroy.push(...new_on_destroy);
+      } else {
+        run_all(new_on_destroy);
+      }
+      component.$$.on_mount = [];
+    });
+  }
+  after_update.forEach(add_render_callback);
 }
-function C(t, e) {
-  const n = t.$$;
-  n.fragment !== null && (D(n.on_destroy), n.fragment && n.fragment.d(e), n.on_destroy = n.fragment = null, n.ctx = []);
+function destroy_component(component, detaching) {
+  const $$ = component.$$;
+  if ($$.fragment !== null) {
+    run_all($$.on_destroy);
+    $$.fragment && $$.fragment.d(detaching);
+    $$.on_destroy = $$.fragment = null;
+    $$.ctx = [];
+  }
 }
-function pt(t, e) {
-  t.$$.dirty[0] === -1 && (b.push(t), dt(), t.$$.dirty.fill(0)), t.$$.dirty[e / 31 | 0] |= 1 << e % 31;
+function make_dirty(component, i) {
+  if (component.$$.dirty[0] === -1) {
+    dirty_components.push(component);
+    schedule_update();
+    component.$$.dirty.fill(0);
+  }
+  component.$$.dirty[i / 31 | 0] |= 1 << i % 31;
 }
-function tt(t, e, n, r, s, l, i, o = [-1]) {
-  const u = L;
-  y(t);
-  const c = t.$$ = {
+function init(component, options, instance2, create_fragment2, not_equal, props, append_styles, dirty = [-1]) {
+  const parent_component = current_component;
+  set_current_component(component);
+  const $$ = component.$$ = {
     fragment: null,
     ctx: null,
-    props: l,
-    update: U,
-    not_equal: s,
-    bound: O(),
+    props,
+    update: noop,
+    not_equal,
+    bound: blank_object(),
     on_mount: [],
     on_destroy: [],
     on_disconnect: [],
     before_update: [],
     after_update: [],
-    context: new Map(e.context || (u ? u.$$.context : [])),
-    callbacks: O(),
-    dirty: o,
-    skip_bound: !1,
-    root: e.target || u.$$.root
+    context: new Map(options.context || (parent_component ? parent_component.$$.context : [])),
+    callbacks: blank_object(),
+    dirty,
+    skip_bound: false,
+    root: options.target || parent_component.$$.root
   };
-  i && i(c.root);
-  let _ = !1;
-  if (c.ctx = n ? n(t, e.props || {}, (a, k, ...d) => {
-    const I = d.length ? d[0] : k;
-    return c.ctx && s(c.ctx[a], c.ctx[a] = I) && (!c.skip_bound && c.bound[a] && c.bound[a](I), _ && pt(t, a)), k;
-  }) : [], c.update(), _ = !0, D(c.before_update), c.fragment = r ? r(c.ctx) : !1, e.target) {
-    if (e.hydrate) {
-      const a = ft(e.target);
-      c.fragment && c.fragment.l(a), a.forEach(m);
-    } else
-      c.fragment && c.fragment.c();
-    e.intro && g(t.$$.fragment), M(t, e.target, e.anchor, e.customElement), X();
+  append_styles && append_styles($$.root);
+  let ready = false;
+  $$.ctx = instance2 ? instance2(component, options.props || {}, (i, ret, ...rest) => {
+    const value = rest.length ? rest[0] : ret;
+    if ($$.ctx && not_equal($$.ctx[i], $$.ctx[i] = value)) {
+      if (!$$.skip_bound && $$.bound[i])
+        $$.bound[i](value);
+      if (ready)
+        make_dirty(component, i);
+    }
+    return ret;
+  }) : [];
+  $$.update();
+  ready = true;
+  run_all($$.before_update);
+  $$.fragment = create_fragment2 ? create_fragment2($$.ctx) : false;
+  if (options.target) {
+    if (options.hydrate) {
+      const nodes = children(options.target);
+      $$.fragment && $$.fragment.l(nodes);
+      nodes.forEach(detach);
+    } else {
+      $$.fragment && $$.fragment.c();
+    }
+    if (options.intro)
+      transition_in(component.$$.fragment);
+    mount_component(component, options.target, options.anchor, options.customElement);
+    flush();
   }
-  y(u);
+  set_current_component(parent_component);
 }
-class et {
+class SvelteComponent {
   $destroy() {
-    C(this, 1), this.$destroy = U;
+    destroy_component(this, 1);
+    this.$destroy = noop;
   }
-  $on(e, n) {
-    const r = this.$$.callbacks[e] || (this.$$.callbacks[e] = []);
-    return r.push(n), () => {
-      const s = r.indexOf(n);
-      s !== -1 && r.splice(s, 1);
+  $on(type, callback) {
+    const callbacks = this.$$.callbacks[type] || (this.$$.callbacks[type] = []);
+    callbacks.push(callback);
+    return () => {
+      const index = callbacks.indexOf(callback);
+      if (index !== -1)
+        callbacks.splice(index, 1);
     };
   }
-  $set(e) {
-    this.$$set && !rt(e) && (this.$$.skip_bound = !0, this.$$set(e), this.$$.skip_bound = !1);
+  $set($$props) {
+    if (this.$$set && !is_empty($$props)) {
+      this.$$.skip_bound = true;
+      this.$$set($$props);
+      this.$$.skip_bound = false;
+    }
   }
 }
-const R = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMTZweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMTZweCIgZmlsbD0iI2ZmZiI+CiAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIiBvcGFjaXR5PSIuODciLz4KICA8cGF0aCBkPSJNMTcuNTEgMy44N0wxNS43MyAyLjEgNS44NCAxMmw5LjkgOS45IDEuNzctMS43N0w5LjM4IDEybDguMTMtOC4xM3oiLz4KPC9zdmc+", J = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjRweCIgZmlsbD0iI2ZmZiI+CiAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIi8+CiAgPHBhdGggZD0iTTE2IDh2OEg4VjhoOG0yLTJINnYxMmgxMlY2eiIvPgo8L3N2Zz4=", Y = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjRweCIgZmlsbD0iI2ZmZiI+CiAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIi8+CiAgPHBhdGggZD0iTTEyIDUuODNMMTUuMTcgOWwxLjQxLTEuNDFMMTIgMyA3LjQxIDcuNTkgOC44MyA5IDEyIDUuODN6bTAgMTIuMzRMOC44MyAxNWwtMS40MSAxLjQxTDEyIDIxbDQuNTktNC41OUwxNS4xNyAxNSAxMiAxOC4xN3oiLz4KPC9zdmc+";
-function ht(t) {
-  let e, n, r, s;
-  const l = t[2].default, i = ot(l, t, t[1], null);
+const ArrowBackIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMTZweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMTZweCIgZmlsbD0iI2ZmZiI+CiAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIiBvcGFjaXR5PSIuODciLz4KICA8cGF0aCBkPSJNMTcuNTEgMy44N0wxNS43MyAyLjEgNS44NCAxMmw5LjkgOS45IDEuNzctMS43N0w5LjM4IDEybDguMTMtOC4xM3oiLz4KPC9zdmc+";
+const StopIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjRweCIgZmlsbD0iI2ZmZiI+CiAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIi8+CiAgPHBhdGggZD0iTTE2IDh2OEg4VjhoOG0yLTJINnYxMmgxMlY2eiIvPgo8L3N2Zz4=";
+const AutoScrollIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjRweCIgZmlsbD0iI2ZmZiI+CiAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIi8+CiAgPHBhdGggZD0iTTEyIDUuODNMMTUuMTcgOWwxLjQxLTEuNDFMMTIgMyA3LjQxIDcuNTkgOC44MyA5IDEyIDUuODN6bTAgMTIuMzRMOC44MyAxNWwtMS40MSAxLjQxTDEyIDIxbDQuNTktNC41OUwxNS4xNyAxNSAxMiAxOC4xN3oiLz4KPC9zdmc+";
+function create_fragment$1(ctx) {
+  let button;
+  let current;
+  let mounted;
+  let dispose;
+  const default_slot_template = ctx[2].default;
+  const default_slot = create_slot(default_slot_template, ctx, ctx[1], null);
   return {
     c() {
-      e = P("button"), i && i.c(), f(e, "height", "40px"), f(e, "padding", "8px"), f(e, "display", "flex"), f(e, "justify-content", "center"), f(e, "align-items", "center"), f(e, "border", "none"), f(e, "outline", "none"), f(e, "background", "transparent"), f(e, "cursor", "pointer");
+      button = element("button");
+      if (default_slot)
+        default_slot.c();
+      set_style(button, "height", "40px");
+      set_style(button, "padding", "8px");
+      set_style(button, "display", "flex");
+      set_style(button, "justify-content", "center");
+      set_style(button, "align-items", "center");
+      set_style(button, "border", "none");
+      set_style(button, "outline", "none");
+      set_style(button, "background", "transparent");
+      set_style(button, "cursor", "pointer");
     },
-    m(o, u) {
-      p(o, e, u), i && i.m(e, null), n = !0, r || (s = ct(e, "click", function() {
-        F(t[0]) && t[0].apply(this, arguments);
-      }), r = !0);
+    m(target, anchor) {
+      insert(target, button, anchor);
+      if (default_slot) {
+        default_slot.m(button, null);
+      }
+      current = true;
+      if (!mounted) {
+        dispose = listen(button, "click", function() {
+          if (is_function(ctx[0]))
+            ctx[0].apply(this, arguments);
+        });
+        mounted = true;
+      }
     },
-    p(o, [u]) {
-      t = o, i && i.p && (!n || u & 2) && lt(
-        i,
-        l,
-        t,
-        t[1],
-        n ? it(l, t[1], u, null) : st(t[1]),
-        null
-      );
+    p(new_ctx, [dirty]) {
+      ctx = new_ctx;
+      if (default_slot) {
+        if (default_slot.p && (!current || dirty & 2)) {
+          update_slot_base(
+            default_slot,
+            default_slot_template,
+            ctx,
+            ctx[1],
+            !current ? get_all_dirty_from_scope(ctx[1]) : get_slot_changes(default_slot_template, ctx[1], dirty, null),
+            null
+          );
+        }
+      }
     },
-    i(o) {
-      n || (g(i, o), n = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(default_slot, local);
+      current = true;
     },
-    o(o) {
-      $(i, o), n = !1;
+    o(local) {
+      transition_out(default_slot, local);
+      current = false;
     },
-    d(o) {
-      o && m(e), i && i.d(o), r = !1, s();
+    d(detaching) {
+      if (detaching)
+        detach(button);
+      if (default_slot)
+        default_slot.d(detaching);
+      mounted = false;
+      dispose();
     }
   };
 }
-function $t(t, e, n) {
-  let { $$slots: r = {}, $$scope: s } = e, { onClick: l } = e;
-  return t.$$set = (i) => {
-    "onClick" in i && n(0, l = i.onClick), "$$scope" in i && n(1, s = i.$$scope);
-  }, [l, s, r];
+function instance$1($$self, $$props, $$invalidate) {
+  let { $$slots: slots = {}, $$scope } = $$props;
+  let { onClick } = $$props;
+  $$self.$$set = ($$props2) => {
+    if ("onClick" in $$props2)
+      $$invalidate(0, onClick = $$props2.onClick);
+    if ("$$scope" in $$props2)
+      $$invalidate(1, $$scope = $$props2.$$scope);
+  };
+  return [onClick, $$scope, slots];
 }
-class T extends et {
-  constructor(e) {
-    super(), tt(this, e, $t, ht, K, { onClick: 0 });
+class Button extends SvelteComponent {
+  constructor(options) {
+    super();
+    init(this, options, instance$1, create_fragment$1, safe_not_equal, { onClick: 0 });
   }
 }
-function Q(t) {
-  let e, n, r, s, l, i;
-  return e = new T({
+function create_if_block(ctx) {
+  let button0;
+  let t0;
+  let button1;
+  let t1;
+  let button2;
+  let current;
+  button0 = new Button({
     props: {
-      onClick: t[4]("resize"),
-      $$slots: { default: [It] },
-      $$scope: { ctx: t }
+      onClick: ctx[4]("resize"),
+      $$slots: { default: [create_default_slot_3] },
+      $$scope: { ctx }
     }
-  }), r = new T({
+  });
+  button1 = new Button({
     props: {
-      onClick: t[4]("interval", 500),
-      $$slots: { default: [bt] },
-      $$scope: { ctx: t }
+      onClick: ctx[4]("interval", 500),
+      $$slots: { default: [create_default_slot_2] },
+      $$scope: { ctx }
     }
-  }), l = new T({
+  });
+  button2 = new Button({
     props: {
-      onClick: t[4]("interval", 1500),
-      $$slots: { default: [yt] },
-      $$scope: { ctx: t }
+      onClick: ctx[4]("interval", 1500),
+      $$slots: { default: [create_default_slot_1] },
+      $$scope: { ctx }
     }
-  }), {
-    c() {
-      N(e.$$.fragment), n = E(), N(r.$$.fragment), s = E(), N(l.$$.fragment);
-    },
-    m(o, u) {
-      M(e, o, u), p(o, n, u), M(r, o, u), p(o, s, u), M(l, o, u), i = !0;
-    },
-    p(o, u) {
-      const c = {};
-      u & 1024 && (c.$$scope = { dirty: u, ctx: o }), e.$set(c);
-      const _ = {};
-      u & 1024 && (_.$$scope = { dirty: u, ctx: o }), r.$set(_);
-      const a = {};
-      u & 1024 && (a.$$scope = { dirty: u, ctx: o }), l.$set(a);
-    },
-    i(o) {
-      i || (g(e.$$.fragment, o), g(r.$$.fragment, o), g(l.$$.fragment, o), i = !0);
-    },
-    o(o) {
-      $(e.$$.fragment, o), $(r.$$.fragment, o), $(l.$$.fragment, o), i = !1;
-    },
-    d(o) {
-      C(e, o), o && m(n), C(r, o), o && m(s), C(l, o);
-    }
-  };
-}
-function It(t) {
-  let e;
+  });
   return {
     c() {
-      e = j("Auto");
+      create_component(button0.$$.fragment);
+      t0 = space();
+      create_component(button1.$$.fragment);
+      t1 = space();
+      create_component(button2.$$.fragment);
     },
-    m(n, r) {
-      p(n, e, r);
+    m(target, anchor) {
+      mount_component(button0, target, anchor);
+      insert(target, t0, anchor);
+      mount_component(button1, target, anchor);
+      insert(target, t1, anchor);
+      mount_component(button2, target, anchor);
+      current = true;
     },
-    d(n) {
-      n && m(e);
+    p(ctx2, dirty) {
+      const button0_changes = {};
+      if (dirty & 1024) {
+        button0_changes.$$scope = { dirty, ctx: ctx2 };
+      }
+      button0.$set(button0_changes);
+      const button1_changes = {};
+      if (dirty & 1024) {
+        button1_changes.$$scope = { dirty, ctx: ctx2 };
+      }
+      button1.$set(button1_changes);
+      const button2_changes = {};
+      if (dirty & 1024) {
+        button2_changes.$$scope = { dirty, ctx: ctx2 };
+      }
+      button2.$set(button2_changes);
+    },
+    i(local) {
+      if (current)
+        return;
+      transition_in(button0.$$.fragment, local);
+      transition_in(button1.$$.fragment, local);
+      transition_in(button2.$$.fragment, local);
+      current = true;
+    },
+    o(local) {
+      transition_out(button0.$$.fragment, local);
+      transition_out(button1.$$.fragment, local);
+      transition_out(button2.$$.fragment, local);
+      current = false;
+    },
+    d(detaching) {
+      destroy_component(button0, detaching);
+      if (detaching)
+        detach(t0);
+      destroy_component(button1, detaching);
+      if (detaching)
+        detach(t1);
+      destroy_component(button2, detaching);
     }
   };
 }
-function bt(t) {
-  let e;
+function create_default_slot_3(ctx) {
+  let t;
   return {
     c() {
-      e = j("500ms");
+      t = text("Auto");
     },
-    m(n, r) {
-      p(n, e, r);
+    m(target, anchor) {
+      insert(target, t, anchor);
     },
-    d(n) {
-      n && m(e);
+    d(detaching) {
+      if (detaching)
+        detach(t);
     }
   };
 }
-function yt(t) {
-  let e;
+function create_default_slot_2(ctx) {
+  let t;
   return {
     c() {
-      e = j("1.5s");
+      t = text("500ms");
     },
-    m(n, r) {
-      p(n, e, r);
+    m(target, anchor) {
+      insert(target, t, anchor);
     },
-    d(n) {
-      n && m(e);
+    d(detaching) {
+      if (detaching)
+        detach(t);
     }
   };
 }
-function Mt(t) {
-  let e, n;
+function create_default_slot_1(ctx) {
+  let t;
   return {
     c() {
-      e = P("img"), H(e.src, n = t[1] ? J : t[0] ? R : Y) || S(e, "src", n), S(e, "alt", "Logo");
+      t = text("1.5s");
     },
-    m(r, s) {
-      p(r, e, s);
+    m(target, anchor) {
+      insert(target, t, anchor);
     },
-    p(r, s) {
-      s & 3 && !H(e.src, n = r[1] ? J : r[0] ? R : Y) && S(e, "src", n);
-    },
-    d(r) {
-      r && m(e);
+    d(detaching) {
+      if (detaching)
+        detach(t);
     }
   };
 }
-function Ct(t) {
-  let e, n, r, s, l = t[0] && Q(t);
-  return r = new T({
+function create_default_slot(ctx) {
+  let img;
+  let img_src_value;
+  return {
+    c() {
+      img = element("img");
+      if (!src_url_equal(img.src, img_src_value = ctx[1] ? StopIcon : ctx[0] ? ArrowBackIcon : AutoScrollIcon))
+        attr(img, "src", img_src_value);
+      attr(img, "alt", "Logo");
+    },
+    m(target, anchor) {
+      insert(target, img, anchor);
+    },
+    p(ctx2, dirty) {
+      if (dirty & 3 && !src_url_equal(img.src, img_src_value = ctx2[1] ? StopIcon : ctx2[0] ? ArrowBackIcon : AutoScrollIcon)) {
+        attr(img, "src", img_src_value);
+      }
+    },
+    d(detaching) {
+      if (detaching)
+        detach(img);
+    }
+  };
+}
+function create_fragment(ctx) {
+  let div;
+  let t;
+  let button;
+  let current;
+  let if_block = ctx[0] && create_if_block(ctx);
+  button = new Button({
     props: {
-      onClick: t[1] ? t[3] : t[2],
-      $$slots: { default: [Mt] },
-      $$scope: { ctx: t }
+      onClick: ctx[1] ? ctx[3] : ctx[2],
+      $$slots: { default: [create_default_slot] },
+      $$scope: { ctx }
     }
-  }), {
+  });
+  return {
     c() {
-      e = P("div"), l && l.c(), n = E(), N(r.$$.fragment), f(e, "position", "fixed"), f(e, "bottom", "16px"), f(e, "left", "0"), f(e, "z-index", "99999999"), f(e, "background", "#333333aa"), f(e, "backdrop-filter", "blur(10px)"), f(e, "display", "flex"), f(e, "border-radius", "0 20px 20px 0");
+      div = element("div");
+      if (if_block)
+        if_block.c();
+      t = space();
+      create_component(button.$$.fragment);
+      set_style(div, "position", "fixed");
+      set_style(div, "bottom", "16px");
+      set_style(div, "left", "0");
+      set_style(div, "z-index", "99999999");
+      set_style(div, "background", "#333333aa");
+      set_style(div, "backdrop-filter", "blur(10px)");
+      set_style(div, "display", "flex");
+      set_style(div, "border-radius", "0 20px 20px 0");
     },
-    m(i, o) {
-      p(i, e, o), l && l.m(e, null), ut(e, n), M(r, e, null), s = !0;
+    m(target, anchor) {
+      insert(target, div, anchor);
+      if (if_block)
+        if_block.m(div, null);
+      append(div, t);
+      mount_component(button, div, null);
+      current = true;
     },
-    p(i, [o]) {
-      i[0] ? l ? (l.p(i, o), o & 1 && g(l, 1)) : (l = Q(i), l.c(), g(l, 1), l.m(e, n)) : l && (mt(), $(l, 1, 1, () => {
-        l = null;
-      }), _t());
-      const u = {};
-      o & 2 && (u.onClick = i[1] ? i[3] : i[2]), o & 1027 && (u.$$scope = { dirty: o, ctx: i }), r.$set(u);
+    p(ctx2, [dirty]) {
+      if (ctx2[0]) {
+        if (if_block) {
+          if_block.p(ctx2, dirty);
+          if (dirty & 1) {
+            transition_in(if_block, 1);
+          }
+        } else {
+          if_block = create_if_block(ctx2);
+          if_block.c();
+          transition_in(if_block, 1);
+          if_block.m(div, t);
+        }
+      } else if (if_block) {
+        group_outros();
+        transition_out(if_block, 1, 1, () => {
+          if_block = null;
+        });
+        check_outros();
+      }
+      const button_changes = {};
+      if (dirty & 2)
+        button_changes.onClick = ctx2[1] ? ctx2[3] : ctx2[2];
+      if (dirty & 1027) {
+        button_changes.$$scope = { dirty, ctx: ctx2 };
+      }
+      button.$set(button_changes);
     },
-    i(i) {
-      s || (g(l), g(r.$$.fragment, i), s = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(if_block);
+      transition_in(button.$$.fragment, local);
+      current = true;
     },
-    o(i) {
-      $(l), $(r.$$.fragment, i), s = !1;
+    o(local) {
+      transition_out(if_block);
+      transition_out(button.$$.fragment, local);
+      current = false;
     },
-    d(i) {
-      i && m(e), l && l.d(), C(r);
+    d(detaching) {
+      if (detaching)
+        detach(div);
+      if (if_block)
+        if_block.d();
+      destroy_component(button);
     }
   };
 }
-function Dt(t, e, n) {
-  let r = !1;
-  function s() {
-    n(0, r = !r);
+function instance($$self, $$props, $$invalidate) {
+  let open = false;
+  function toggleMenu() {
+    $$invalidate(0, open = !open);
   }
-  const l = () => window.scroll({
+  const scroll = () => window.scroll({
     top: document.body.scrollHeight,
     left: 0,
     behavior: "smooth"
-  }), i = new ResizeObserver(() => l());
-  let o, u = !1;
-  const c = (d, I = 1e3) => {
-    d === "resize" ? i.observe(document.body) : d === "interval" && (o = setInterval(l, I)), n(1, u = d), n(0, r = !r);
-  }, _ = (d) => {
-    d === "resize" ? i.unobserve(document.body) : d === "interval" && clearInterval(o), n(1, u = !1);
+  });
+  const resizeObserver = new ResizeObserver(() => scroll());
+  let intervalId;
+  let scrolling = false;
+  const startScroll = (type, interval = 1e3) => {
+    if (type === "resize")
+      resizeObserver.observe(document.body);
+    else if (type === "interval")
+      intervalId = setInterval(scroll, interval);
+    $$invalidate(1, scrolling = type);
+    $$invalidate(0, open = !open);
   };
-  return [r, u, s, () => {
-    u && _(u);
-  }, (d, I = 1e3) => () => {
-    u ? _(d) : c(d, I);
-  }];
+  const cancelScroll = (type) => {
+    if (type === "resize")
+      resizeObserver.unobserve(document.body);
+    else if (type === "interval")
+      clearInterval(intervalId);
+    $$invalidate(1, scrolling = false);
+  };
+  const cancelCurrentScroll = () => {
+    if (scrolling)
+      cancelScroll(scrolling);
+  };
+  const toggleScroll = (type, intervalSecond = 1e3) => () => {
+    if (scrolling) {
+      cancelScroll(type);
+    } else {
+      startScroll(type, intervalSecond);
+    }
+  };
+  return [open, scrolling, toggleMenu, cancelCurrentScroll, toggleScroll];
 }
-class wt extends et {
-  constructor(e) {
-    super(), tt(this, e, Dt, Ct, K, {});
+class App extends SvelteComponent {
+  constructor(options) {
+    super();
+    init(this, options, instance, create_fragment, safe_not_equal, {});
   }
 }
-const xt = new wt({
+const main = new App({
   target: document.body
 });
 export {
-  xt as default
+  main as default
 };
