@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Auto Scroll Button
 // @namespace    https://github.com/Jkker/tampermonkey-auto-scroll
-// @version      1.0
+// @version      1.0.1
 // @description  Adds a button to scroll down the page when new content is loaded or by a certain interval
 // @author       Jkker
-// @license MIT
+// @license      MIT
 // @match        *://*/*
 // @icon         https://raw.githubusercontent.com/Jkker/tampermonkey-auto-scroll/master/src/icons/Unfold.svg
 // @grant        none
