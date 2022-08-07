@@ -1,0 +1,12 @@
+// ==UserScript==
+// @name         Auto Scroll Button
+// @namespace    https://github.com/Jkker/tampermonkey-auto-scroll
+// @version      1.0
+// @description  Auto scroll down the page
+// @author       Jkker
+// @match        *://*/*
+// @icon         https://raw.githubusercontent.com/Jkker/tampermonkey-auto-scroll/master/src/icons/Unfold.svg
+// @grant        none
+// @updateURL  https://raw.githubusercontent.com/Jkker/tampermonkey-auto-scroll/master/dist/auto-scroll.umd.cjs
+// @downloadURL  https://raw.githubusercontent.com/Jkker/tampermonkey-auto-scroll/master/dist/auto-scroll.umd.cjs
+// ==/UserScript==
