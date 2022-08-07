@@ -23,7 +23,7 @@
 				curr = iter.iterateNext();
 			}
 		} catch (e) {
-			console.error(`Error: Document tree modified during iteration ${e}`);
+			console.error(`Auto Scroll Button Error: Document tree modified during iteration ${e}`);
 		}
 		return prev;
 	};
@@ -53,8 +53,7 @@
 		if (!last) return false;
 		if (last !== lastFound) {
 			lastFound = last;
-			console.log('found', last);
-			(last as HTMLElement).scrollIntoView({ behavior: 'smooth' });
+			(last as HTMLElement).scrollIntoView();
 			return true;
 		} else {
 			return false;

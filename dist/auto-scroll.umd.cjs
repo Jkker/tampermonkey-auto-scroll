@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Auto Scroll Button
 // @namespace    https://github.com/Jkker/tampermonkey-auto-scroll
-// @version      1.1.0
+// @version      1.1.1
 // @description  Adds a button to scroll down the page when new content is loaded or by a certain interval
 // @author       Jkker
 // @license      MIT
@@ -540,7 +540,7 @@
           curr = iter.iterateNext();
         }
       } catch (e) {
-        console.error(`Error: Document tree modified during iteration ${e}`);
+        console.error(`Auto Scroll Button Error: Document tree modified during iteration ${e}`);
       }
       return prev;
     };
@@ -567,8 +567,7 @@
         return false;
       if (last !== lastFound) {
         lastFound = last;
-        console.log("found", last);
-        last.scrollIntoView({ behavior: "smooth" });
+        last.scrollIntoView();
         return true;
       } else {
         return false;
